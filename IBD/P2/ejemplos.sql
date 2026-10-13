@@ -7,8 +7,15 @@ UPDATE products SET quantityInStock = quantityInStock - 20
 DELETE FROM customers WHERE customerNumber = 501;
 
 WITH TotalCliente AS (
-	SELECT o.customerNumber, SUM(od.quantityOrdered * od.priceEach) AS total 
+  SELECT o.customerNumber, SUM(od.quantityOrdered * od.priceEach) AS total 
 	FROM orders o 
 	JOIN orderdetails od ON o.orderNumber = od.orderNumber 
-	GROUP BY o.customerNumber), 
-PromedioGeneral AS (SELECT AVG(total) AS promedio FROM TotalCliente) SELECT c.customerName, tc.total FROM customers c JOIN TotalCliente tc ON c.customerNumber = tc.customerNumber CROSS JOIN PromedioGeneral pg WHERE tc.total > pg.promedio;
+	GROUP BY o.customerNumber
+), PromedioGeneral AS (
+  SELECT AVG(total) AS promedio 
+  FROM TotalCliente)
+SELECT c.customerName, tc.total 
+FROM customers c 
+JOIN TotalCliente tc ON c.customerNumber = tc.customerNumber 
+CROSS JOIN PromedioGeneral pg 
+WHERE tc.total > pg.promedio;
